@@ -1,7 +1,5 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Employer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -31,17 +29,22 @@ class EmployerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ClientTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        # Add custom claims if needed
-        return token
+class AuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ['id', 'name', 'biography', 'born_date']
 
 
-class EmployerTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        # Add custom claims if needed
-        return token
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ['id', 'name']
+
+
+class BookSerializer(serializers.ModelSerializer):
+    authors = serializers.PrimaryKeyRelatedField(queryset=Author.objects.all(), many=True)
+    genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)
+
+    class Meta:
+        model = Book
+        fields = '__all__'

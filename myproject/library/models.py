@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework import viewsets
 
 
 class Client(models.Model):

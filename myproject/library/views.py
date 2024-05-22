@@ -1,14 +1,10 @@
-from django.contrib.auth.models import User
-from rest_framework import viewsets, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions, filters
+from .permissions import IsEmployer, IsClient
+from rest_framework import status
 from rest_framework.response import Response
-from .models import Client, Employer
-from .serializers import UserSerializer, ClientSerializer, EmployerSerializer
+from .serializers import *
 
-from django.contrib.auth.models import User
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from .models import Client
-from .serializers import UserSerializer, ClientSerializer
 
 class UserRegistrationViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -24,10 +20,42 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ClientViewSet(viewsets.ModelViewSet):
-    queryset = Client.objects.all()
-    serializer_class = ClientSerializer
+class BookViewSetForEmployer(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated, IsEmployer]
 
-class EmployerViewSet(viewsets.ModelViewSet):
-    queryset = Employer.objects.all()
-    serializer_class = EmployerSerializer
+
+'''
+class BookListView(ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated, IsClient]
+
+class BookDetailView(RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookDetailSerializer
+    permission_classes = [permissions.IsAuthenticated, IsClient]
+'''
+
+
+class BookViewSetForClient(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated, IsClient]
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['title', 'authors__name', 'genres__name', 'publication_date']
+    search_fields = ['title', 'authors__name', 'genres__name']
+    ordering_fields = ['title', 'publication_date', 'stock_quantity']
+
+    def create(self, request, *args, **kwargs):
+        return Response({'message': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response({'message': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response({'message': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response({'message': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
