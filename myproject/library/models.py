@@ -1,11 +1,7 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.contrib.auth.hashers import make_password
+from datetime import timezone, datetime, timedelta
+
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework import viewsets
 
 
 class Client(models.Model):
@@ -48,6 +44,8 @@ class Book(models.Model):
     title = models.CharField(max_length=200, verbose_name="Title")
     publication_date = models.DateField(verbose_name="Publication Date")
     stock_quantity = models.IntegerField(verbose_name="Stock Quantity")
+    reserved_quantity = models.IntegerField(verbose_name="Reserved", default=0)
+    all_reserved_quantity = models.IntegerField(verbose_name="Reserved all the time", default=0)
 
     class Meta:
         verbose_name = "Book"
@@ -56,3 +54,26 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Reservation(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    reserved_at = models.DateTimeField(auto_now_add=True)
+    expiry_date = models.DateTimeField(null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.expiry_date:
+            self.expiry_date = datetime.now() + \
+                               timedelta(hours=20)
+        super().save(*args, **kwargs)
+
+
+class BookIssue(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    issued_at = models.DateTimeField(auto_now_add=True)
+    returned_at = models.DateTimeField(null=True, blank=True)
+
+    def is_returned(self):
+        return self.returned_at is not None
