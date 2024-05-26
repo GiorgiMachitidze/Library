@@ -1,14 +1,22 @@
 from django.contrib import admin
 from .models import *
 
+
 @admin.register(BookIssue)
 class BookIssueAdmin(admin.ModelAdmin):
-    list_display = ('book', 'client', 'issued_at', 'returned_at', 'is_returned')
+    list_display = ('book', 'client', 'issued_at', 'returned_at', 'is_returned', 'have_to_return_at')
+
+
+@admin.register(Reservation)
+class BookReservationAdmin(admin.ModelAdmin):
+    list_display = ('client', 'book', 'reserved_at', 'expiry_date')
+
 
 class BookIssueInline(admin.TabularInline):
     model = BookIssue
     readonly_fields = ('issued_at', 'returned_at')
     can_delete = False
+
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -16,6 +24,7 @@ class BookAdmin(admin.ModelAdmin):
     list_filter = ['genres', 'publication_date']
     search_fields = ['title', 'authors__name', 'genres__name']
     inlines = [BookIssueInline]
+
     def issued_count(self, obj):
         return obj.issued_count()
 
@@ -38,5 +47,3 @@ class GenreAdmin(admin.ModelAdmin):
 
 admin.site.register(Client)
 admin.site.register(Employer)
-admin.site.register(Reservation)
-

@@ -13,5 +13,4 @@ class Command(BaseCommand):
         time_now = timezone.now() - timedelta(hours=4)
         reservations_to_delete = Reservation.objects.filter(expiry_date__lt=time_now)
         reservations_to_delete.delete()
-
         self.stdout.write(self.style.SUCCESS('Expired old reservations'))

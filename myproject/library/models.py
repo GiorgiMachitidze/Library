@@ -1,4 +1,4 @@
-from datetime import timezone, datetime, timedelta
+from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -7,9 +7,15 @@ from django.db import models
 class Client(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return str(self.user)
+
 
 class Employer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.user)
 
 
 class Genre(models.Model):
@@ -59,8 +65,8 @@ class Book(models.Model):
 class Reservation(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    reserved_at = models.DateTimeField(auto_now_add=True)
-    expiry_date = models.DateTimeField(null=True)
+    reserved_at = models.DateTimeField(auto_now_add=True, verbose_name="Reservation date")
+    expiry_date = models.DateTimeField(null=True, verbose_name="Date of expiration")
 
     def save(self, *args, **kwargs):
         if not self.expiry_date:
@@ -72,8 +78,9 @@ class Reservation(models.Model):
 class BookIssue(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    issued_at = models.DateTimeField(auto_now_add=True)
-    returned_at = models.DateTimeField(null=True, blank=True)
+    issued_at = models.DateTimeField(auto_now_add=True, verbose_name="Issue Date")
+    have_to_return_at = models.DateTimeField(null=True, verbose_name="Date of return")
+    returned_at = models.DateTimeField(null=True, blank=True, verbose_name="Returned at")
 
     def is_returned(self):
         return self.returned_at is not None

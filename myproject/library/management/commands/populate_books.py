@@ -10,14 +10,12 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         faker = Faker()
 
-        # Create some genres
         genres = []
         for _ in range(10):
             genre_name = faker.word()
             genre, created = Genre.objects.get_or_create(name=genre_name)
             genres.append(genre)
 
-        # Create some authors
         authors = []
         for _ in range(50):
             author_name = faker.name()
@@ -41,11 +39,9 @@ class Command(BaseCommand):
                 stock_quantity=stock_quantity,
             )
 
-            # Add random authors to the book
             num_authors = random.randint(1, 5)
             book.authors.set(random.sample(authors, num_authors))
 
-            # Add random genres to the book
             num_genres = random.randint(1, 3)
             book.genres.set(random.sample(genres, num_genres))
 
