@@ -104,9 +104,6 @@ class BookViewSetForClient(viewsets.ModelViewSet):
         return Response({'message': 'Method not allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-# views.py
-
-
 class StatisticsViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer

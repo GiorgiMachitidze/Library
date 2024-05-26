@@ -151,7 +151,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-# settings.py
 
 CELERY_BEAT_SCHEDULE = {
     'run-every-24-hours': {
